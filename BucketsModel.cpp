@@ -15,44 +15,32 @@ int BucketsModel::rowCount(const QModelIndex & /*parent*/) const {
 int BucketsModel::columnCount(const QModelIndex & /*parent*/) const {
   return COLUMNS;
 }
-static QString toString(Structures::WeightUnit const unit) {
-  switch (unit) {
-    case Structures::WeightUnit::Gram:
-      return "Gram";
-    case Structures::WeightUnit::KiloGram:
-      return "KiloGram";
-    case Structures::WeightUnit::Tonne:
-      return "Tonne";
-  }
-  return "Error";
-}
 
 QVariant BucketsModel::data(const QModelIndex &index, int role) const {
-  auto it = _buckets.begin();
   if (!index.isValid()) return QVariant();
-  if (role == Qt::DisplayRole) switch (index.column()) {
+  if (role == Qt::DisplayRole) {
+    switch (index.column()) {
       case 0:  // weight
       {
         if (index.row() < 0) return "QError(1) , invalid index";
         if (index.row() >= static_cast<int>(_buckets.size()))
           return "QError(1) , out of range";
-        std::advance(it, index.row());
-        return QString::number(it->weight);
+        return QString::number(_buckets[index.row()].convert(currentUnit()));
       }
       case 1:  // weight unit
-        return toString(currentUnit());
+        return Structures::wUnittoString(currentUnit());
       case 2:  // weight unit
       {
         if (index.row() < 0) return "QError(2) , invalid index";
         if (index.row() >= static_cast<int>(_buckets.size()))
           return "QError(2) , out of range";
-        std::advance(it, index.row());
-        return QString::fromStdString(it->description);
+        return QString::fromStdString(_buckets[index.row()].description);
       }
       default:
         assert("Please report to the developer.");
         return "Assert!";
     }
+  }
   return QString("QError , Make valid return data!");
 }
 
@@ -76,31 +64,29 @@ QVariant BucketsModel::headerData(int section,
         return "Assert!";
     }
   } else
-    return QStringLiteral("%1").arg(section);
+    return QStringLiteral("# %1").arg(section);
 }
 void BucketsModel::addNewBucket(Structures::Bucket const &bucket) {
   beginResetModel();
-  _buckets.insert(bucket);
+  _buckets << bucket;
   endResetModel();
+  emit dataUpdated();
 }
 
 bool BucketsModel::removeBucket(int index) {
-  if (index >= static_cast<int>(_buckets.size())) return false;
-  auto it = _buckets.begin();
-  std::advance(it, index);
-  if (_buckets.end() != it) {
-    beginResetModel();
-    _buckets.erase(it);
-    endResetModel();
-    return true;
-  } else
-    return false;
+  if (index >= static_cast<int>(_buckets.size()) || index < 0) return false;
+  beginResetModel();
+  _buckets.remove(index);
+  endResetModel();
+  emit dataUpdated();
+  return true;
 }
 
 void BucketsModel::clear() {
   beginResetModel();
   _buckets.clear();
   endResetModel();
+  emit dataUpdated();
 }
 
 QByteArray BucketsModel::toCSV() const {
@@ -120,4 +106,14 @@ void BucketsModel::setCurrentUnit(const Structures::WeightUnit &currentUnit) {
   beginResetModel();
   _currentUnit = currentUnit;
   endResetModel();
+  emit dataUpdated();
+}
+
+QVector<Structures::Bucket> BucketsModel::buckets() const { return _buckets; }
+
+void BucketsModel::setBuckets(const QVector<Structures::Bucket> &buckets) {
+  beginResetModel();
+  _buckets = buckets;
+  endResetModel();
+  emit dataUpdated();
 }

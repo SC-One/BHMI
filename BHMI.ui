@@ -100,7 +100,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBox">
+           <widget class="QComboBox" name="weightUnitCmb">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
               <horstretch>0</horstretch>
@@ -195,14 +195,14 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="totalBucketsCount_2">
+              <widget class="QLabel" name="sumBucketsWeight">
                <property name="font">
                 <font>
                  <pointsize>14</pointsize>
                 </font>
                </property>
                <property name="text">
-                <string>0 Kg</string>
+                <string>0</string>
                </property>
               </widget>
              </item>
@@ -256,8 +256,11 @@
                    <bold>true</bold>
                   </font>
                  </property>
+                 <property name="toolTip">
+                  <string>Front</string>
+                 </property>
                  <property name="text">
-                  <string>Front Pressure </string>
+                  <string>Sensor 1</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -265,7 +268,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="frontP">
+                <widget class="QDoubleSpinBox" name="sensor1">
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
                  </property>
@@ -289,8 +292,11 @@
                    <bold>true</bold>
                   </font>
                  </property>
+                 <property name="toolTip">
+                  <string>Back</string>
+                 </property>
                  <property name="text">
-                  <string>Bottom Pressure </string>
+                  <string>Sensor 2</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -298,7 +304,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="bottomP">
+                <widget class="QDoubleSpinBox" name="sensor2">
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
                  </property>
@@ -322,8 +328,11 @@
                    <bold>true</bold>
                   </font>
                  </property>
+                 <property name="toolTip">
+                  <string>Left</string>
+                 </property>
                  <property name="text">
-                  <string>Left Pressure </string>
+                  <string>Raw Sensor</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -331,7 +340,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="leftP">
+                <widget class="QDoubleSpinBox" name="rawSensor">
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
                  </property>
@@ -384,7 +393,7 @@
         <item>
          <widget class="QPushButton" name="rmvBtn">
           <property name="text">
-           <string>Remove bucket</string>
+           <string>Remove bucket(s)</string>
           </property>
          </widget>
         </item>

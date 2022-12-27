@@ -25,6 +25,7 @@ class BHMI : public QMainWindow {
   void updateDateTime();
   void onAddBUcket();
   void onSaveBuckets();
+  void onRemoveBucket();
 
  private:
   // helper functions

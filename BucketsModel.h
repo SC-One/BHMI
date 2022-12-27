@@ -21,6 +21,9 @@ class BucketsModel : public QAbstractTableModel {
   QVariant headerData(int section, Qt::Orientation orientation,
                       int role = Qt::DisplayRole) const override;
 
+ signals:
+  void dataUpdated();
+
  public:
   void addNewBucket(Structures::Bucket const &bucket);
   bool removeBucket(int index = 0);
@@ -30,9 +33,12 @@ class BucketsModel : public QAbstractTableModel {
   Structures::WeightUnit currentUnit() const;
   void setCurrentUnit(const Structures::WeightUnit &currentUnit);
 
+  QVector<Structures::Bucket> buckets() const;
+  void setBuckets(const QVector<Structures::Bucket> &buckets);
+
  private:
   Structures::WeightUnit _currentUnit;
-  std::set<Structures::Bucket> _buckets;
+  QVector<Structures::Bucket> _buckets;
 };
 
 #endif  // BUCKETS_MODEL_H

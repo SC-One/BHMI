@@ -3,6 +3,7 @@
 #include <BucketsModel.h>
 #include <NewBucket.h>
 
+#include <QComboBox>
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -25,7 +26,7 @@ BHMI::~BHMI() { delete ui; }
 
 void BHMI::updateDateTime() {
   auto currentDateTime = QDateTime::currentDateTime();
-  ui->timeLbl->setText(currentDateTime.time().toString());
+  ui->timeLbl->setText(currentDateTime.time().toString());  // "hh:mm" origin
   ui->dateLbl->setText(currentDateTime.date().toString("dd/MM/yyyy"));
   ui->dayLbl->setText(currentDateTime.toString("dddd"));
 }
@@ -33,7 +34,9 @@ void BHMI::updateDateTime() {
 void BHMI::onAddBUcket() {
   NewBucket bucketAdder;
   auto res = bucketAdder.exec();
-  qDebug() << res;
+  if (res) {
+    _bucketsModel->addNewBucket(bucketAdder.bucket());
+  }
 }
 
 void BHMI::onSaveBuckets() {
@@ -63,23 +66,72 @@ void BHMI::onSaveBuckets() {
   }
 }
 
+void BHMI::onRemoveBucket() {
+  auto selectedModel = _bucketsView->selectionModel();
+  if (selectedModel->hasSelection()) {
+    auto selectedRows = selectedModel->selectedRows();
+    for (auto const &item : selectedRows) {
+      _bucketsModel->removeBucket(item.row());
+    }
+  }
+}
+
 void BHMI::initBucketView() {
   _bucketsView = new QTableView(this);
   _bucketsModel.reset(new BucketsModel);
   {
-    ui->bucketParentLayout->insertWidget(1, _bucketsView.data(), 10);
     _bucketsView->setModel(_bucketsModel.get());
-    //  _bucketsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->bucketParentLayout->insertWidget(1, _bucketsView.data(), 10);
+    _bucketsView->horizontalHeader()->setSectionResizeMode(
+        QHeaderView::Stretch);
     //  _bucketsView->horizontalHeader()->setSectionResizeMode(
     //      1, QHeaderView::ResizeMode::ResizeToContents);
-    _bucketsView->resizeColumnsToContents();
-    _bucketsView->horizontalHeader()->setStretchLastSection(true);
+    //    _bucketsView->horizontalHeader()->setStretchLastSection(true);
+    //    _bucketsView->resizeColumnsToContents();
+    _bucketsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    //    connect(_bucketsView.data(), &QTableView::doubleClicked, this,
+    //            [this](QModelIndex const &index) {
+    //              _bucketsModel->removeBucket(index.row());
+    //            });
     _bucketsView->horizontalHeader()->setStyleSheet(
         "background-color: rgb(196, 160, 0);");
   }
   {
     connect(ui->addBtn, &QPushButton::clicked, this, &BHMI::onAddBUcket);
     connect(ui->saveBtn, &QPushButton::clicked, this, &BHMI::onSaveBuckets);
+    connect(ui->rmvBtn, &QPushButton::clicked, this, &BHMI::onRemoveBucket);
+    connect(_bucketsModel.get(), &BucketsModel::dataUpdated, this, [this]() {
+      auto totalBuckets = _bucketsModel->buckets();
+      std::uint_fast32_t sum = 0;
+      for (auto const &item : totalBuckets) {
+        sum += item.weight;
+      }
+      Structures::Bucket tempTotalBuckets;
+      tempTotalBuckets.weight = sum;
+      ui->sumBucketsWeight->setText(
+          QString::number(
+              tempTotalBuckets.convert(_bucketsModel->currentUnit())) +
+          " " + Structures::wUnittoString(_bucketsModel->currentUnit()));
+      ui->totalBucketsCount->setText(QString::number(totalBuckets.size()));
+    });
+    connect(ui->weightUnitCmb,
+            QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [this](int index) {
+              switch (index) {
+                case 0:
+                  _bucketsModel->setCurrentUnit(Structures::Gram);
+                  break;
+                case 1:
+                  _bucketsModel->setCurrentUnit(Structures::KiloGram);
+                  break;
+                case 2:
+                  _bucketsModel->setCurrentUnit(Structures::Tonne);
+                  break;
+                default:
+                  break;
+              }
+            });
   }
 }
 
