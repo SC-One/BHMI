@@ -1,6 +1,8 @@
 #ifndef NEWBUCKET_H
 #define NEWBUCKET_H
 
+#include <Structures.h>
+
 #include <QDialog>
 #include <QString>
 
@@ -20,7 +22,12 @@ class NewBucket : public QDialog {
     int weight;
   };
 
-  Info data() const;
+  Structures::Bucket bucket() const;
+
+ private:
+  void init();
+ private slots:
+  void updateView(int weightValue);
 
  private:
   Ui::NewBucket *ui;

@@ -1,6 +1,7 @@
 #include "BHMI.h"
 
 #include <BucketsModel.h>
+#include <NewBucket.h>
 
 #include <QDateTime>
 #include <QDebug>
@@ -29,7 +30,11 @@ void BHMI::updateDateTime() {
   ui->dayLbl->setText(currentDateTime.toString("dddd"));
 }
 
-void BHMI::onAddBUcket() {}
+void BHMI::onAddBUcket() {
+  NewBucket bucketAdder;
+  auto res = bucketAdder.exec();
+  qDebug() << res;
+}
 
 void BHMI::onSaveBuckets() {
   QString fileName = QFileDialog::getSaveFileName(
