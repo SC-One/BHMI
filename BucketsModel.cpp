@@ -41,7 +41,7 @@ QVariant BucketsModel::data(const QModelIndex &index, int role) const {
         return "Assert!";
     }
   }
-  return QString("QError , Make valid return data!");
+  return QVariant();  //"QError , Make valid return data!"
 }
 
 QVariant BucketsModel::headerData(int section,

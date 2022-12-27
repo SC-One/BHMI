@@ -16,6 +16,17 @@ class DriverSettings : public QWidget {
   explicit DriverSettings(QWidget *parent = nullptr);
   ~DriverSettings();
 
+  struct Information {
+    QString driverName;
+    QString driverCode;
+    QString driverPhone;
+    QString employerName;
+    QString vehicleCode;
+  };
+
+  Information info() const;
+
+ private slots:
   void load();
   void save();
 

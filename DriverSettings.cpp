@@ -15,6 +15,13 @@ DriverSettings::DriverSettings(QWidget *parent)
     : QWidget(parent), ui(new Ui::DriverSettings), _settings(new QSettings) {
   ui->setupUi(this);
 
+  connect(ui->driverFullName, &QLineEdit::textEdited, this,
+          &DriverSettings::save);
+  connect(ui->driverCode, &QLineEdit::textEdited, this, &DriverSettings::save);
+  connect(ui->driverPhone, &QLineEdit::textEdited, this, &DriverSettings::save);
+  connect(ui->employerFullName, &QLineEdit::textEdited, this,
+          &DriverSettings::save);
+  connect(ui->vehicleCode, &QLineEdit::textEdited, this, &DriverSettings::save);
   load();
 }
 
@@ -22,6 +29,16 @@ DriverSettings::~DriverSettings() {
   save();
   _settings->sync();  //
   delete ui;
+}
+
+DriverSettings::Information DriverSettings::info() const {
+  DriverSettings::Information result;
+  result.driverName = ui->driverFullName->text();
+  result.driverCode = ui->driverCode->text();
+  result.driverPhone = ui->driverPhone->text();
+  result.employerName = ui->employerFullName->text();
+  result.vehicleCode = ui->vehicleCode->text();
+  return result;
 }
 
 void DriverSettings::load() {
@@ -38,14 +55,13 @@ void DriverSettings::load() {
     ui->employerFullName->setText(employerName.toString());
     ui->vehicleCode->setText(vehicleCode.toString());
   }
-  qDebug() << _settings->status();
 }
 
 void DriverSettings::save() {
-  _settings->setValue(DRIVER_FULL_NAME, ui->driverFullName->text());
-  _settings->setValue(DRIVER_CODE, ui->driverCode->text());
-  _settings->setValue(DRIVER_PHONE, ui->driverPhone->text());
-  _settings->setValue(EMPLOYER_FULL_NAME, ui->employerFullName->text());
-  _settings->setValue(VEHICLE_CODE, ui->vehicleCode->text());
-  qDebug() << _settings->status();
+  auto infoResult = info();
+  _settings->setValue(DRIVER_FULL_NAME, infoResult.driverName);
+  _settings->setValue(DRIVER_CODE, infoResult.driverCode);
+  _settings->setValue(DRIVER_PHONE, infoResult.driverPhone);
+  _settings->setValue(EMPLOYER_FULL_NAME, infoResult.employerName);
+  _settings->setValue(VEHICLE_CODE, infoResult.vehicleCode);
 }
