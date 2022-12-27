@@ -4,6 +4,7 @@
 #include <BucketsModel.h>
 #include <DriverSettings.h>
 #include <NewBucket.h>
+#include <SerialHandler.h>
 
 #include <QComboBox>
 #include <QDateTime>
@@ -18,11 +19,13 @@
 
 #include "./ui_BHMI.h"
 
-BHMI::BHMI(QWidget *parent) : QMainWindow(parent), ui(new Ui::BHMI) {
+BHMI::BHMI(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::BHMI), _sensorSH(new SerialHandler) {
   ui->setupUi(this);
   initTimer();
   initBucketView();
   initSettings();
+  initLoadManagement();
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -150,11 +153,24 @@ void BHMI::initTimer() {
 }
 
 void BHMI::initSettings() {
-  connect(ui->settingsBtn, &QPushButton::clicked, this, []() {
-    auto driver = new DriverSettings();
-    driver->show();
+  connect(ui->settingsBtn, &QPushButton::clicked, this,
+          [this]() { _sensorSH->show(); });
+  connect(_sensorSH.get(), &SerialHandler::startPortClicked, this, [this]() {
+    _sensorSH->close();
+    _sensorSH->openSerialPort([](QByteArray const &ba) { qDebug() << ba; });
   });
 }
+
+void BHMI::initLoadManagement() {
+  connect(ui->loadManagementBtn, &QPushButton::clicked, this, []() {
+    static auto driverDialog = new DriverSettings();
+    driverDialog->setWindowModality(Qt::WindowModality::ApplicationModal);
+    driverDialog->setWindowFlag(Qt::Dialog);
+    driverDialog->show();
+  });
+}
+
+// void BHMI::initSensorsNetwork() {}
 
 void BHMI::turnCameraOn() {}
 

@@ -6,6 +6,7 @@
 #include <QTimer>
 
 class BucketsModel;
+class SerialHandler;
 QT_BEGIN_NAMESPACE
 class QTableView;
 
@@ -40,6 +41,8 @@ class BHMI : public QMainWindow {
   void initBucketView();
   void initTimer();
   void initSettings();
+  void initLoadManagement();
+  //  void initSensorsNetwork();
   void turnCameraOn();
 
  private:
@@ -50,5 +53,7 @@ class BHMI : public QMainWindow {
   QScopedPointer<BucketsModel> _bucketsModel;
 
   bool _cameraMode;
+
+  QScopedPointer<SerialHandler> _sensorSH;  // sensor serial handler
 };
 #endif  // BHMI_H

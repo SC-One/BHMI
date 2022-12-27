@@ -42,7 +42,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="descText"/>
+    <widget class="QPlainTextEdit" name="descText">
+     <property name="placeholderText">
+      <string>Explain more ...</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

@@ -11,7 +11,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core SerialPort REQUIRED)
+find_package(Qt5Core REQUIRED)
 
 add_executable(BHMI
   main.cpp
@@ -21,6 +22,10 @@ add_executable(BHMI
   NewBucket.h NewBucket.cpp NewBucket.ui
   DriverSettings.h DriverSettings.cpp DriverSettings.ui
   SerialHandler.h SerialHandler.cpp SerialHandler.ui
+  ApplicationTime.h ApplicationTime.cpp ApplicationTime.ui
 )
 
-target_link_libraries(BHMI PRIVATE Qt5::Widgets )
+target_link_libraries(BHMI PRIVATE
+    Qt5::Widgets
+    Qt5::SerialPort
+)
