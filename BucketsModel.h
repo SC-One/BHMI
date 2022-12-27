@@ -23,6 +23,7 @@ class BucketsModel : public QAbstractTableModel {
 
  public:
   void addNewBucket(Structures::Bucket const &bucket);
+  bool removeBucket(int index = 0);
   void clear();
   QByteArray toCSV() const;
 

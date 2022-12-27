@@ -84,6 +84,19 @@ void BucketsModel::addNewBucket(Structures::Bucket const &bucket) {
   endResetModel();
 }
 
+bool BucketsModel::removeBucket(int index) {
+  if (index >= static_cast<int>(_buckets.size())) return false;
+  auto it = _buckets.begin();
+  std::advance(it, index);
+  if (_buckets.end() != it) {
+    beginResetModel();
+    _buckets.erase(it);
+    endResetModel();
+    return true;
+  } else
+    return false;
+}
+
 void BucketsModel::clear() {
   beginResetModel();
   _buckets.clear();
