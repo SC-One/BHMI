@@ -6,6 +6,7 @@
 #include <NewBucket.h>
 #include <SerialHandler.h>
 
+#include <QCameraViewfinder>
 #include <QComboBox>
 #include <QDataStream>
 #include <QDateTime>
@@ -22,7 +23,10 @@
 #include "./ui_BHMI.h"
 
 BHMI::BHMI(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::BHMI), _sensorSH(new SerialHandler) {
+    : QMainWindow(parent),
+      ui(new Ui::BHMI),
+      _sensorSH(new SerialHandler),
+      _cameraView(new QCameraViewfinder) {
   ui->setupUi(this);
   initTimer();
   initBucketView();
@@ -37,6 +41,7 @@ BHMI::BHMI(QWidget *parent)
     data.s1 = 0;
     setLastData(data);
   }
+  initCamera();
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -210,7 +215,14 @@ void BHMI::initLoadManagement() {
 
 // void BHMI::initSensorsNetwork() {}
 
-void BHMI::turnCameraOn() {}
+void BHMI::turnCameraOn() { _cameraDriver.start(); }
+
+void BHMI::turnCameraOff() { _cameraDriver.stop(); }
+
+void BHMI::initCamera() {
+  new QCameraViewfinder(this);
+  _cameraDriver.setCameraRenderer(_cameraView.get());
+}
 
 Structures::DataOverSerial BHMI::getLastData() const { return _lastData; }
 
@@ -234,6 +246,7 @@ void BHMI::onCameraModeChanged(bool turnOn) {
     _bucketsView->hide();
     ui->backCameraPic->show();
   } else {
+    turnCameraOff();
     ui->totalSumFrame->show();
     _bucketsView->show();
     ui->backCameraPic->hide();

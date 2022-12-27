@@ -1,12 +1,13 @@
 #ifndef BHMI_H
 #define BHMI_H
 
+#include <CameraDriver.h>
 #include <Structures.h>
 
 #include <QMainWindow>
 #include <QPointer>
 #include <QTimer>
-
+class QCameraViewfinder;
 class BucketsModel;
 class SerialHandler;
 QT_BEGIN_NAMESPACE
@@ -50,6 +51,8 @@ class BHMI : public QMainWindow {
   void initLoadManagement();
   //  void initSensorsNetwork();
   void turnCameraOn();
+  void turnCameraOff();
+  void initCamera();
 
   void updateDataOverSerial(const Structures::DataOverSerial &data);
 
@@ -65,5 +68,8 @@ class BHMI : public QMainWindow {
   QScopedPointer<SerialHandler> _sensorSH;  // sensor serial handler
 
   Structures::DataOverSerial _lastData;
+
+  QScopedPointer<QCameraViewfinder> _cameraView;
+  CameraDriver _cameraDriver;
 };
 #endif  // BHMI_H

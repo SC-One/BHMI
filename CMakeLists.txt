@@ -11,8 +11,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 COMPONENTS Widgets Core SerialPort REQUIRED)
-find_package(I2C)
+find_package(Qt5 COMPONENTS Widgets Core SerialPort Multimedia REQUIRED)
+find_package(Qt5MultimediaWidgets REQUIRED)
 
 add_executable(BHMI
   main.cpp
@@ -29,6 +29,9 @@ add_executable(BHMI
 target_link_libraries(BHMI PRIVATE
     Qt5::Widgets
     Qt5::SerialPort
+    Qt5::Multimedia
+    Qt5::MultimediaWidgets
+#    i2c
 )
 
 #message(FATAL_ERROR ${I2C_FOUND})
