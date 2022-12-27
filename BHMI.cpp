@@ -31,10 +31,10 @@ void BHMI::initBucketView() {
   ui->bucketParentLayout->insertWidget(1, _bucketsView.data(), 10);
   _bucketsView->setModel(_bucketsModel.get());
   //  _bucketsView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  _bucketsView->horizontalHeader()->setSectionResizeMode(
-      1, QHeaderView::ResizeMode::ResizeToContents);
   //  _bucketsView->horizontalHeader()->setSectionResizeMode(
-  //      0, QHeaderView::ResizeMode::Stretch);
+  //      1, QHeaderView::ResizeMode::ResizeToContents);
+  _bucketsView->resizeColumnsToContents();
+  _bucketsView->horizontalHeader()->setStretchLastSection(true);
 }
 
 void BHMI::initTimer() {
