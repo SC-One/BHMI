@@ -73,9 +73,9 @@ void BucketsModel::addNewBucket(Structures::Bucket const &bucket) {
 
 QByteArray BucketsModel::toCSV() const {
   QByteArray result;
+  result.append("Weight\n");
   for (auto const &item : _buckets) {
-    result.append(QString::number(item.weight));
-    result.append("\n");
+    result.append(QString::number(item.weight)).append("\n");
   }
   return result;
 }
