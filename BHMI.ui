@@ -21,7 +21,7 @@
        <number>2</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,10,1">
+       <layout class="QVBoxLayout" name="bucketParentLayout" stretch="0,1">
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -30,6 +30,9 @@
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
           <property name="bottomMargin">
            <number>0</number>
           </property>
@@ -63,10 +66,29 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QComboBox" name="comboBox">
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(114, 159, 207);</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>G(Gram)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Kg(Kilogram)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>T(Tonne)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QWidget" name="bucketView" native="true"/>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -167,7 +189,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0">
         <property name="topMargin">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="bottomMargin">
          <number>2</number>

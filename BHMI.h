@@ -2,9 +2,13 @@
 #define BHMI_H
 
 #include <QMainWindow>
+#include <QPointer>
 #include <QTimer>
 
+class BucketsModel;
 QT_BEGIN_NAMESPACE
+class QTableView;
+
 namespace Ui {
 class BHMI;
 }
@@ -21,7 +25,15 @@ class BHMI : public QMainWindow {
   void updateDateTime();
 
  private:
+  // helper functions
+  void initBucketView();
+  void initTimer();
+
+ private:
   Ui::BHMI *ui;
   QTimer _timeUpdater;
+
+  QPointer<QTableView> _bucketsView;
+  QScopedPointer<BucketsModel> _bucketsModel;
 };
 #endif  // BHMI_H
