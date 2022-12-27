@@ -20,6 +20,7 @@ add_executable(BHMI
   Structures.h
   NewBucket.h NewBucket.cpp NewBucket.ui
   DriverSettings.h DriverSettings.cpp DriverSettings.ui
+  SerialHandler.h SerialHandler.cpp SerialHandler.ui
 )
 
 target_link_libraries(BHMI PRIVATE Qt5::Widgets )

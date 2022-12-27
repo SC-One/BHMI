@@ -33,6 +33,8 @@ class BHMI : public QMainWindow {
   bool getCamera() const;
   void setCamera(bool value);
 
+  void onCameraModeChanged(bool turnOn);
+
  private:
   // helper functions
   void initBucketView();
