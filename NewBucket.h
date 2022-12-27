@@ -2,6 +2,7 @@
 #define NEWBUCKET_H
 
 #include <QDialog>
+#include <QString>
 
 namespace Ui {
 class NewBucket;
@@ -13,6 +14,13 @@ class NewBucket : public QDialog {
  public:
   explicit NewBucket(QWidget *parent = nullptr);
   ~NewBucket();
+
+  struct Info {
+    QString description;
+    int weight;
+  };
+
+  Info data() const;
 
  private:
   Ui::NewBucket *ui;
