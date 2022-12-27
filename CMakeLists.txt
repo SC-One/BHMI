@@ -19,6 +19,7 @@ add_executable(BHMI
   BucketsModel.h BucketsModel.cpp
   Structures.h
   NewBucket.h NewBucket.cpp NewBucket.ui
+  DriverSettings.h DriverSettings.cpp DriverSettings.ui
 )
 
 target_link_libraries(BHMI PRIVATE Qt5::Widgets )

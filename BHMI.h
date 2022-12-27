@@ -37,7 +37,7 @@ class BHMI : public QMainWindow {
   // helper functions
   void initBucketView();
   void initTimer();
-
+  void initSettings();
   void turnCameraOn();
 
  private:

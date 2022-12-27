@@ -1,6 +1,8 @@
+
 #include "BHMI.h"
 
 #include <BucketsModel.h>
+#include <DriverSettings.h>
 #include <NewBucket.h>
 
 #include <QComboBox>
@@ -20,6 +22,7 @@ BHMI::BHMI(QWidget *parent) : QMainWindow(parent), ui(new Ui::BHMI) {
   ui->setupUi(this);
   initTimer();
   initBucketView();
+  initSettings();
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -155,6 +158,13 @@ void BHMI::initTimer() {
   _timeUpdater.setInterval(1000);
   connect(&_timeUpdater, &QTimer::timeout, this, &BHMI::updateDateTime);
   _timeUpdater.start();
+}
+
+void BHMI::initSettings() {
+  connect(ui->settingsBtn, &QPushButton::clicked, this, []() {
+    auto driver = new DriverSettings();
+    driver->show();
+  });
 }
 
 void BHMI::turnCameraOn() {}

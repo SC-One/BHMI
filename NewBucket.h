@@ -17,11 +17,6 @@ class NewBucket : public QDialog {
   explicit NewBucket(QWidget *parent = nullptr);
   ~NewBucket();
 
-  struct Info {
-    QString description;
-    int weight;
-  };
-
   Structures::Bucket bucket() const;
 
  private:
