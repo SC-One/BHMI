@@ -20,7 +20,7 @@ BHMI::~BHMI() { delete ui; }
 void BHMI::updateDateTime() {
   auto currentDateTime = QDateTime::currentDateTime();
   ui->timeLbl->setText(currentDateTime.time().toString());
-  ui->dateLbl->setText(currentDateTime.date().toString());
+  ui->dateLbl->setText(currentDateTime.date().toString("dd/MM/yyyy"));
   ui->dayLbl->setText(currentDateTime.toString("dddd"));
 }
 
@@ -35,6 +35,8 @@ void BHMI::initBucketView() {
   //      1, QHeaderView::ResizeMode::ResizeToContents);
   _bucketsView->resizeColumnsToContents();
   _bucketsView->horizontalHeader()->setStretchLastSection(true);
+  _bucketsView->horizontalHeader()->setStyleSheet(
+      "background-color: rgb(196, 160, 0);");
 }
 
 void BHMI::initTimer() {
