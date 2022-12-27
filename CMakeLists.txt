@@ -15,11 +15,10 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 add_executable(BHMI
   main.cpp
-  BHMI.cpp
-  BHMI.h
-  BHMI.ui
+  BHMI.h BHMI.cpp BHMI.ui
   BucketsModel.h BucketsModel.cpp
   Structures.h
+  NewBucket.h NewBucket.cpp NewBucket.ui
 )
 
 target_link_libraries(BHMI PRIVATE Qt5::Widgets )
