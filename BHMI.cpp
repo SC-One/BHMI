@@ -133,6 +133,21 @@ void BHMI::initBucketView() {
               }
             });
   }
+  {
+    connect(this, &BHMI::cameraModeChanged, this, [this](bool turnOn) {
+      if (turnOn) {
+        turnCameraOn();  // TODO: you should take data from serial camera and
+                         // show it
+        ui->totalSumFrame->hide();
+        _bucketsView->hide();
+        ui->backCameraPic->show();
+      } else {
+        ui->totalSumFrame->show();
+        _bucketsView->show();
+        ui->backCameraPic->hide();
+      }
+    });
+  }
 }
 
 void BHMI::initTimer() {
@@ -140,4 +155,13 @@ void BHMI::initTimer() {
   _timeUpdater.setInterval(1000);
   connect(&_timeUpdater, &QTimer::timeout, this, &BHMI::updateDateTime);
   _timeUpdater.start();
+}
+
+void BHMI::turnCameraOn() {}
+
+bool BHMI::getCamera() const { return _cameraMode; }
+
+void BHMI::setCamera(bool value) {
+  _cameraMode = value;
+  emit cameraModeChanged(value);
 }

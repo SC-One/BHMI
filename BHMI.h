@@ -21,16 +21,24 @@ class BHMI : public QMainWindow {
   BHMI(QWidget *parent = nullptr);
   ~BHMI();
 
+ signals:
+  void cameraModeChanged(bool turnOn);
+
  private slots:
   void updateDateTime();
   void onAddBUcket();
   void onSaveBuckets();
   void onRemoveBucket();
 
+  bool getCamera() const;
+  void setCamera(bool value);
+
  private:
   // helper functions
   void initBucketView();
   void initTimer();
+
+  void turnCameraOn();
 
  private:
   Ui::BHMI *ui;
@@ -38,5 +46,7 @@ class BHMI : public QMainWindow {
 
   QPointer<QTableView> _bucketsView;
   QScopedPointer<BucketsModel> _bucketsModel;
+
+  bool _cameraMode;
 };
 #endif  // BHMI_H
