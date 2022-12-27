@@ -23,6 +23,8 @@ class BHMI : public QMainWindow {
 
  private slots:
   void updateDateTime();
+  void onAddBUcket();
+  void onSaveBuckets();
 
  private:
   // helper functions
