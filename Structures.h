@@ -44,6 +44,15 @@ struct Bucket {
     }
   }
 };
+
+struct DataOverSerial {
+  bool cameraOn;   // 4
+  bool newBucket;  // 3
+  float rawPump;   // 2
+  float s2;        // 1
+  float s1;        // 0
+};
+
 }  // namespace Structures
 
 #endif  // STRUCTURES_H

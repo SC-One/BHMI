@@ -3,10 +3,12 @@
 #include <QSpinBox>
 
 #include "ui_NewBucket.h"
-NewBucket::NewBucket(QWidget *parent) : QDialog(parent), ui(new Ui::NewBucket) {
+NewBucket::NewBucket(QWidget *parent, int bucketWeight)
+    : QDialog(parent), ui(new Ui::NewBucket) {
   ui->setupUi(this);
-  init();
-  updateView(ui->weight->value());
+  //  init();
+  //  updateView(ui->weight->value());
+  setBucket(bucketWeight);
 }
 
 NewBucket::~NewBucket() { delete ui; }
@@ -17,6 +19,8 @@ Structures::Bucket NewBucket::bucket() const {
   result.description = ui->descText->toPlainText().toStdString();
   return result;
 }
+
+void NewBucket::setBucket(int weight) { ui->weight->setValue(weight); }
 
 void NewBucket::init() {
   connect(ui->weight, QOverload<int>::of(&QSpinBox::valueChanged), this,

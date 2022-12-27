@@ -28,14 +28,20 @@
      </item>
      <item>
       <widget class="QSpinBox" name="weight">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
        <property name="suffix">
         <string> (kg)</string>
+       </property>
+       <property name="minimum">
+        <number>-999999</number>
        </property>
        <property name="maximum">
         <number>9999999</number>
        </property>
        <property name="value">
-        <number>100</number>
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -44,7 +50,7 @@
    <item>
     <widget class="QPlainTextEdit" name="descText">
      <property name="placeholderText">
-      <string>Explain more ...</string>
+      <string>Explain(optional)</string>
      </property>
     </widget>
    </item>
@@ -60,6 +66,10 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>descText</tabstop>
+  <tabstop>weight</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

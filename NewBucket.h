@@ -14,10 +14,12 @@ class NewBucket : public QDialog {
   Q_OBJECT
 
  public:
-  explicit NewBucket(QWidget *parent = nullptr);
+  explicit NewBucket(QWidget *parent = nullptr, int bucketWeight = 0);
   ~NewBucket();
 
   Structures::Bucket bucket() const;
+
+  void setBucket(int weight);
 
  private:
   void init();

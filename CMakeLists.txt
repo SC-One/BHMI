@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt5 COMPONENTS Widgets Core SerialPort REQUIRED)
-find_package(Qt5Core REQUIRED)
+find_package(I2C)
 
 add_executable(BHMI
   main.cpp
@@ -23,9 +23,26 @@ add_executable(BHMI
   DriverSettings.h DriverSettings.cpp DriverSettings.ui
   SerialHandler.h SerialHandler.cpp SerialHandler.ui
   ApplicationTime.h ApplicationTime.cpp ApplicationTime.ui
+  CameraDriver.h CameraDriver.cpp
 )
 
 target_link_libraries(BHMI PRIVATE
     Qt5::Widgets
     Qt5::SerialPort
 )
+
+#message(FATAL_ERROR ${I2C_FOUND})
+
+
+##[=======================================================================[.rst:
+#FindI2C
+#-------
+
+#Find the I2C device library.
+
+#Once done this will define the following variables::
+
+#  I2C_INCLUDE_DIRS    - I2C include directory
+#  I2C_LIBRARIES       - I2C libraries
+#  I2C_FOUND           - if false, you cannot build anything that requires I2C
+##]=======================================================================]

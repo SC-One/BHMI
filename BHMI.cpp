@@ -7,6 +7,7 @@
 #include <SerialHandler.h>
 
 #include <QComboBox>
+#include <QDataStream>
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
@@ -16,6 +17,7 @@
 #include <QMessageBox>
 #include <QTableView>
 #include <QtMultimedia/QAbstractVideoFilter>
+#include <cstdint>
 
 #include "./ui_BHMI.h"
 
@@ -26,6 +28,15 @@ BHMI::BHMI(QWidget *parent)
   initBucketView();
   initSettings();
   initLoadManagement();
+  {
+    Structures::DataOverSerial data;
+    data.cameraOn = 0;
+    data.newBucket = 0;
+    data.rawPump = 0;
+    data.s2 = 0;
+    data.s1 = 0;
+    setLastData(data);
+  }
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -36,12 +47,18 @@ void BHMI::updateDateTime() {
   ui->dateLbl->setText(currentDateTime.date().toString("dd/MM/yyyy"));
   ui->dayLbl->setText(currentDateTime.toString("dddd"));
 }
-
+static float calculateBucket(float s1, float s2) {
+  return 2435 * (s1 - s2) - 2800;
+}
 void BHMI::onAddBUcket() {
-  NewBucket bucketAdder;
-  auto res = bucketAdder.exec();
-  if (res) {
-    _bucketsModel->addNewBucket(bucketAdder.bucket());
+  auto lastData = getLastData();
+  if (lastData.newBucket) {
+    NewBucket bucketAdder;
+    bucketAdder.setBucket(calculateBucket(lastData.s1, lastData.s2));
+    auto res = bucketAdder.exec();
+    if (res) {
+      _bucketsModel->addNewBucket(bucketAdder.bucket());
+    }
   }
 }
 
@@ -152,12 +169,33 @@ void BHMI::initTimer() {
   _timeUpdater.start();
 }
 
+void BHMI::updateDataOverSerial(Structures::DataOverSerial const &data) {
+  ui->sensor1->setValue(25 * (data.s1 - 4));
+  ui->sensor2->setValue(25 * (data.s2 - 4));
+  setCamera(data.cameraOn);
+  ui->addBtn->setEnabled(data.newBucket);
+}
+
 void BHMI::initSettings() {
+  connect(this, &BHMI::lastDataChanged, this,
+          [this]() { updateDataOverSerial(getLastData()); });
   connect(ui->settingsBtn, &QPushButton::clicked, this,
           [this]() { _sensorSH->show(); });
   connect(_sensorSH.get(), &SerialHandler::startPortClicked, this, [this]() {
     _sensorSH->close();
-    _sensorSH->openSerialPort([](QByteArray const &ba) { qDebug() << ba; });
+    _sensorSH->openSerialPort([this](QByteArray const &ba) {
+      QDataStream streammer(ba);
+      Structures::DataOverSerial data;
+      float newBucketTemp;
+      float cameraOnTemp;
+
+      streammer >> data.s1 >> data.s2 >> data.rawPump >> newBucketTemp >>
+          cameraOnTemp;
+      data.newBucket = newBucketTemp;
+      data.cameraOn = cameraOnTemp;
+      setLastData(data);
+      qDebug() << ba;
+    });
   });
 }
 
@@ -173,6 +211,13 @@ void BHMI::initLoadManagement() {
 // void BHMI::initSensorsNetwork() {}
 
 void BHMI::turnCameraOn() {}
+
+Structures::DataOverSerial BHMI::getLastData() const { return _lastData; }
+
+void BHMI::setLastData(const Structures::DataOverSerial &lastData) {
+  _lastData = lastData;
+  emit lastDataChanged();
+}
 
 bool BHMI::getCamera() const { return _cameraMode; }
 

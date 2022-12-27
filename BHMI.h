@@ -1,6 +1,8 @@
 #ifndef BHMI_H
 #define BHMI_H
 
+#include <Structures.h>
+
 #include <QMainWindow>
 #include <QPointer>
 #include <QTimer>
@@ -22,8 +24,12 @@ class BHMI : public QMainWindow {
   BHMI(QWidget *parent = nullptr);
   ~BHMI();
 
+  Structures::DataOverSerial getLastData() const;
+  void setLastData(const Structures::DataOverSerial &lastData);
+
  signals:
   void cameraModeChanged(bool turnOn);
+  void lastDataChanged();
 
  private slots:
   void updateDateTime();
@@ -45,6 +51,8 @@ class BHMI : public QMainWindow {
   //  void initSensorsNetwork();
   void turnCameraOn();
 
+  void updateDataOverSerial(const Structures::DataOverSerial &data);
+
  private:
   Ui::BHMI *ui;
   QTimer _timeUpdater;
@@ -55,5 +63,7 @@ class BHMI : public QMainWindow {
   bool _cameraMode;
 
   QScopedPointer<SerialHandler> _sensorSH;  // sensor serial handler
+
+  Structures::DataOverSerial _lastData;
 };
 #endif  // BHMI_H
