@@ -16,6 +16,7 @@
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QScopedPointer>
 #include <QTableView>
 #include <QtMultimedia/QAbstractVideoFilter>
 #include <cstdint>
@@ -32,6 +33,7 @@ BHMI::BHMI(QWidget *parent)
   initBucketView();
   initSettings();
   initLoadManagement();
+  initCamera();
   {
     Structures::DataOverSerial data;
     data.cameraOn = 0;
@@ -41,7 +43,6 @@ BHMI::BHMI(QWidget *parent)
     data.s1 = 0;
     setLastData(data);
   }
-  initCamera();
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -186,7 +187,7 @@ void BHMI::initSettings() {
           [this]() { updateDataOverSerial(getLastData()); });
   connect(ui->settingsBtn, &QPushButton::clicked, this,
           [this]() { _sensorSH->show(); });
-  connect(_sensorSH.get(), &SerialHandler::startPortClicked, this, [this]() {
+  connect(_sensorSH.data(), &SerialHandler::startPortClicked, this, [this]() {
     _sensorSH->close();
     _sensorSH->openSerialPort([this](QByteArray const &ba) {
       QDataStream streammer(ba);
@@ -205,10 +206,11 @@ void BHMI::initSettings() {
 }
 
 void BHMI::initLoadManagement() {
-  connect(ui->loadManagementBtn, &QPushButton::clicked, this, []() {
+  connect(ui->loadManagementBtn, &QPushButton::clicked, this, [this]() {
     static auto driverDialog = new DriverSettings();
     driverDialog->setWindowModality(Qt::WindowModality::ApplicationModal);
     driverDialog->setWindowFlag(Qt::Dialog);
+    driverDialog->setGeometry(this->x() + 10, this->y() + 10, 400, 250);
     driverDialog->show();
   });
 }
@@ -220,8 +222,9 @@ void BHMI::turnCameraOn() { _cameraDriver.start(); }
 void BHMI::turnCameraOff() { _cameraDriver.stop(); }
 
 void BHMI::initCamera() {
-  new QCameraViewfinder(this);
+  _cameraView.reset(new QCameraViewfinder());
   _cameraDriver.setCameraRenderer(_cameraView.get());
+  ui->bucketParentLayout->insertWidget(1, _cameraView.data());
 }
 
 Structures::DataOverSerial BHMI::getLastData() const { return _lastData; }
@@ -244,11 +247,11 @@ void BHMI::onCameraModeChanged(bool turnOn) {
                      // show it
     ui->totalSumFrame->hide();
     _bucketsView->hide();
-    ui->backCameraPic->show();
+    _cameraView->show();
   } else {
     turnCameraOff();
     ui->totalSumFrame->show();
     _bucketsView->show();
-    ui->backCameraPic->hide();
+    _cameraView->hide();
   }
 }

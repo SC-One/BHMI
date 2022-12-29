@@ -1,7 +1,7 @@
 #include <CameraDriver.h>
 
 #include <QApplication>
-
+#include <QCameraImageCapture>
 //#include <linux/i2c-dev.h>
 //#include <linux/i2c.h>
 //#include <linux/media.h>
@@ -34,14 +34,16 @@ void CameraDriver::setCameraRenderer(QCameraViewfinder *view) {
     assert("Please make sure camera is connected!");
     return;
   }
+  new QCameraImageCapture(_camera.data()); // extra TODO:remove
   _camera->setViewfinder(view);
   //  view->setMediaObject(_camera.get());
 }
 
 bool CameraDriver::start() {
   if (_camera.isNull()) return false;
-  _camera->setCaptureMode(QCamera::CaptureStillImage);
+  _camera->setCaptureMode(QCamera::CaptureViewfinder);
   _camera->start();
+  _camera->searchAndLock();
   return true;
 }
 
