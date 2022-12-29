@@ -279,8 +279,15 @@ void BHMI::initCamera() {
 }
 
 void BHMI::initPrinter() {
-  connect(ui->printBtn, &QPushButton::clicked, this,
-          [this]() { _printer->print(_driverDialog->info().stringify()); });
+  connect(ui->printBtn, &QPushButton::clicked, this, [this]() {
+    auto driverInfoText = _driverDialog->info().stringify();
+    //    _bucketsModel->addNewBucket({213213, "test1"});
+    //    _bucketsModel->addNewBucket({0, "test2"});
+    //    _bucketsModel->addNewBucket({213213213213213213, "test3"});
+    auto buckets = _bucketsModel->toCSV();
+    _printer->print("@@@@@@Info@@@@@@\n" + driverInfoText +
+                    "\n@@@@@@Bucket@@@@@@\n" + buckets);
+  });
 }
 
 Structures::DataOverSerial BHMI::getLastData() const { return _lastData; }
