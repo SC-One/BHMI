@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QDataStream>
 #include <QDateTime>
+#include <QDateTimeEdit>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -17,18 +18,23 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QScopedPointer>
+#include <QTabWidget>
 #include <QTableView>
+#include <QVBoxLayout>
 #include <QtMultimedia/QAbstractVideoFilter>
 #include <cstdint>
 
 #include "./ui_BHMI.h"
 
+static constexpr auto TIMER_UPDATE_SEC = 1;
 BHMI::BHMI(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::BHMI),
       _sensorSH(new SerialHandler),
       _cameraView(new QCameraViewfinder) {
   ui->setupUi(this);
+
+  _dateTimeShow = QDateTime::currentDateTime();
   initTimer();
   initBucketView();
   initSettings();
@@ -48,7 +54,8 @@ BHMI::BHMI(QWidget *parent)
 BHMI::~BHMI() { delete ui; }
 
 void BHMI::updateDateTime() {
-  auto currentDateTime = QDateTime::currentDateTime();
+  { _dateTimeShow = _dateTimeShow.addSecs(TIMER_UPDATE_SEC); }
+  auto const &currentDateTime = _dateTimeShow;
   ui->timeLbl->setText(currentDateTime.time().toString());  // "hh:mm" origin
   ui->dateLbl->setText(currentDateTime.date().toString("dd/MM/yyyy"));
   ui->dayLbl->setText(currentDateTime.toString("dddd"));
@@ -170,7 +177,7 @@ void BHMI::initBucketView() {
 
 void BHMI::initTimer() {
   updateDateTime();
-  _timeUpdater.setInterval(1000);
+  _timeUpdater.setInterval(TIMER_UPDATE_SEC * 1e3);
   connect(&_timeUpdater, &QTimer::timeout, this, &BHMI::updateDateTime);
   _timeUpdater.start();
 }
@@ -185,8 +192,40 @@ void BHMI::updateDataOverSerial(Structures::DataOverSerial const &data) {
 void BHMI::initSettings() {
   connect(this, &BHMI::lastDataChanged, this,
           [this]() { updateDataOverSerial(getLastData()); });
-  connect(ui->settingsBtn, &QPushButton::clicked, this,
-          [this]() { _sensorSH->show(); });
+  connect(ui->settingsBtn, &QPushButton::clicked, this, [this]() {
+    static auto tempSettings = new QDialog();
+    static auto *dateEdit = new QDateTimeEdit(_dateTimeShow);
+    static auto lay = new QVBoxLayout();
+    static bool inited = false;
+
+    static auto xTimer = new QTimer;
+    xTimer->setInterval(TIMER_UPDATE_SEC * 1e3);
+    xTimer->start();
+    connect(xTimer, &QTimer::timeout, this,
+            [this]() { dateEdit->setDateTime(_dateTimeShow); });
+    connect(
+        dateEdit, &QDateTimeEdit::dateTimeChanged, this,
+        [this](QDateTime const &dateTime) { this->_dateTimeShow = dateTime; });
+
+    connect(this, &BHMI::destroyed, [&]() {
+      tempSettings->deleteLater();
+      dateEdit->deleteLater();
+      lay->deleteLater();
+    });
+
+    if (!inited) {
+      dateEdit->setMaximumHeight(37);
+      auto static tabWidget = new QTabWidget;
+      tempSettings->setLayout(lay);
+      lay->addWidget(tabWidget);
+      tabWidget->addTab(dateEdit, "DateTime");
+      tabWidget->addTab(_sensorSH.get(), "SerialSettings");
+      //      lay->addWidget(dateEdit);
+      //      lay->addWidget(_sensorSH.get());
+      inited = true;
+    }
+    tempSettings->exec();
+  });
   connect(_sensorSH.data(), &SerialHandler::startPortClicked, this, [this]() {
     _sensorSH->close();
     _sensorSH->openSerialPort([this](QByteArray const &ba) {

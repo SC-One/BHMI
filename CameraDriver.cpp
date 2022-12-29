@@ -34,7 +34,7 @@ void CameraDriver::setCameraRenderer(QCameraViewfinder *view) {
     assert("Please make sure camera is connected!");
     return;
   }
-  new QCameraImageCapture(_camera.data()); // extra TODO:remove
+  new QCameraImageCapture(_camera.data());  // extra TODO:remove
   _camera->setViewfinder(view);
   //  view->setMediaObject(_camera.get());
 }

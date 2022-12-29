@@ -4,15 +4,18 @@
 #include <CameraDriver.h>
 #include <Structures.h>
 
+#include <QDateTime>
 #include <QMainWindow>
 #include <QPointer>
 #include <QTimer>
-class QCameraViewfinder;
+
 class BucketsModel;
 class SerialHandler;
+
 QT_BEGIN_NAMESPACE
 class QTableView;
-
+class QCameraViewfinder;
+class QDateTimeEdit;
 namespace Ui {
 class BHMI;
 }
@@ -71,5 +74,6 @@ class BHMI : public QMainWindow {
 
   QScopedPointer<QCameraViewfinder> _cameraView;
   CameraDriver _cameraDriver;
+  QDateTime _dateTimeShow;
 };
 #endif  // BHMI_H
