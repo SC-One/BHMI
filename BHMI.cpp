@@ -4,6 +4,7 @@
 #include <BucketsModel.h>
 #include <DriverSettings.h>
 #include <NewBucket.h>
+#include <PrintFirst.h>
 #include <SerialHandler.h>
 
 #include <QCameraViewfinder>
@@ -31,7 +32,9 @@ BHMI::BHMI(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::BHMI),
       _sensorSH(new SerialHandler),
-      _cameraView(new QCameraViewfinder) {
+      _cameraView(new QCameraViewfinder),
+      _driverDialog(new DriverSettings),
+      _printer(new PrintFirst) {
   ui->setupUi(this);
 
   _dateTimeShow = QDateTime::currentDateTime();
@@ -49,6 +52,7 @@ BHMI::BHMI(QWidget *parent)
     data.s1 = 0;
     setLastData(data);
   }
+  initPrinter();
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -255,11 +259,10 @@ void BHMI::initSettings() {
 
 void BHMI::initLoadManagement() {
   connect(ui->loadManagementBtn, &QPushButton::clicked, this, [this]() {
-    static auto driverDialog = new DriverSettings();
-    driverDialog->setWindowModality(Qt::WindowModality::ApplicationModal);
-    driverDialog->setWindowFlag(Qt::Dialog);
-    driverDialog->setGeometry(this->x() + 10, this->y() + 10, 400, 250);
-    driverDialog->show();
+    _driverDialog->setWindowModality(Qt::WindowModality::ApplicationModal);
+    _driverDialog->setWindowFlag(Qt::Dialog);
+    _driverDialog->setGeometry(this->x() + 10, this->y() + 10, 400, 250);
+    _driverDialog->show();
   });
 }
 
@@ -273,6 +276,11 @@ void BHMI::initCamera() {
   _cameraView.reset(new QCameraViewfinder());
   _cameraDriver.setCameraRenderer(_cameraView.get());
   ui->bucketParentLayout->insertWidget(1, _cameraView.data());
+}
+
+void BHMI::initPrinter() {
+  connect(ui->printBtn, &QPushButton::clicked, this,
+          [this]() { _printer->print(_driverDialog->info().stringify()); });
 }
 
 Structures::DataOverSerial BHMI::getLastData() const { return _lastData; }

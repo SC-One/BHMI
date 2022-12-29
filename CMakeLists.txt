@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt5 COMPONENTS Widgets Core SerialPort Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
+find_package(Qt5PrintSupport REQUIRED)
 
 add_executable(BHMI
   main.cpp
@@ -32,6 +33,7 @@ target_link_libraries(BHMI PRIVATE
     Qt5::SerialPort
     Qt5::Multimedia
     Qt5::MultimediaWidgets
+    Qt5::PrintSupport
 #    i2c
 )
 

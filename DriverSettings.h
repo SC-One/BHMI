@@ -22,6 +22,17 @@ class DriverSettings : public QWidget {
     QString driverPhone;
     QString employerName;
     QString vehicleCode;
+    QString stringify() const {
+      static const QString result(
+          "Driver Name: %1 , \tDriverCode: %2"
+          "Driver Phone: %3"
+          "Employer Name: %4 , \tVehicle Code: %5");
+      return result.arg(driverName)
+          .arg(driverCode)
+          .arg(driverPhone)
+          .arg(employerName)
+          .arg(vehicleCode);
+    }
   };
 
   Information info() const;

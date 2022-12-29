@@ -11,6 +11,8 @@
 
 class BucketsModel;
 class SerialHandler;
+class DriverSettings;
+class PrintFirst;
 
 QT_BEGIN_NAMESPACE
 class QTableView;
@@ -56,6 +58,7 @@ class BHMI : public QMainWindow {
   void turnCameraOn();
   void turnCameraOff();
   void initCamera();
+  void initPrinter();
 
   void updateDataOverSerial(const Structures::DataOverSerial &data);
 
@@ -75,5 +78,7 @@ class BHMI : public QMainWindow {
   QScopedPointer<QCameraViewfinder> _cameraView;
   CameraDriver _cameraDriver;
   QDateTime _dateTimeShow;
+  QScopedPointer<DriverSettings> _driverDialog;
+  QScopedPointer<PrintFirst> _printer;
 };
 #endif  // BHMI_H
