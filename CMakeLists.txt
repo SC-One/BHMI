@@ -24,6 +24,7 @@ add_executable(BHMI
   SerialHandler.h SerialHandler.cpp SerialHandler.ui
   ApplicationTime.h ApplicationTime.cpp ApplicationTime.ui
   CameraDriver.h CameraDriver.cpp
+  PrintFirst.h PrintFirst.cpp
 )
 
 target_link_libraries(BHMI PRIVATE
