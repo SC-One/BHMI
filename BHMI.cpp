@@ -170,7 +170,16 @@ void BHMI::initBucketView() {
             });
   }
   {
-    ui->cameraTurner->setVisible(false);
+    ui->cameraTurner->setVisible(true);
+    connect(ui->cameraTurner, &QPushButton::clicked, this, [this]() {
+      Structures::DataOverSerial data;
+      data.cameraOn = !getLastData().cameraOn;
+      data.newBucket = 0;
+      data.rawPump = 0;
+      data.s2 = 0;
+      data.s1 = 0;
+      setLastData(data);
+    });
     connect(this, &BHMI::cameraModeChanged, this, &BHMI::onCameraModeChanged);
   }
 }
