@@ -15,6 +15,8 @@ find_package(Qt5 COMPONENTS Widgets Core SerialPort Multimedia REQUIRED)
 find_package(Qt5MultimediaWidgets REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
 
+qt5_add_resources(RES_FOR_EXE specRes.qrc)
+
 add_executable(BHMI
   main.cpp
   BHMI.h BHMI.cpp BHMI.ui
@@ -26,6 +28,7 @@ add_executable(BHMI
   ApplicationTime.h ApplicationTime.cpp ApplicationTime.ui
   CameraDriver.h CameraDriver.cpp
   PrintFirst.h PrintFirst.cpp
+  ${RES_FOR_EXE}
 )
 
 target_link_libraries(BHMI PRIVATE
@@ -36,6 +39,7 @@ target_link_libraries(BHMI PRIVATE
     Qt5::PrintSupport
 #    i2c
 )
+
 
 #message(FATAL_ERROR ${I2C_FOUND})
 

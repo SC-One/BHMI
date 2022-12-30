@@ -14,6 +14,11 @@
    <string>BHMI</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QWidget#centralwidget {
+	background-image: url(:/new/prefix1/scr.png);
+}</string>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,1">
@@ -422,7 +427,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0,0,0,0,0,0,0,0">
         <property name="topMargin">
          <number>0</number>
         </property>
@@ -494,6 +499,29 @@ radius: 1.35, stop: 0 #fff, stop: 1 #bbb
           </property>
           <property name="checked">
            <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="devBtn">
+          <property name="styleSheet">
+           <string notr="true">QPushButton {  
+	background-color: rgb(255, 145, 145);
+	border:2px solid red;
+ 	border-radius:50px; 
+ 	min-width:100px;
+ 	min-height:100px;
+}
+
+QPushButton:hover {
+	background: qradialgradient(
+		cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,
+		radius: 1.35, stop: 0 #fff, stop: 1 #bbb
+	);
+}</string>
+          </property>
+          <property name="text">
+           <string>Click RemovePic</string>
           </property>
          </widget>
         </item>

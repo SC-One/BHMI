@@ -194,6 +194,7 @@ void SerialHandler::fillPortsInfo() {
 }
 
 void SerialHandler::updateSettings() {
+  qDebug() << "Update settings";
   m_currentSettings.name = ui->serialPortInfoListBox->currentText();
 
   if (ui->baudRateBox->currentIndex() == 4) {

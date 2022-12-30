@@ -53,6 +53,15 @@ BHMI::BHMI(QWidget *parent)
     setLastData(data);
   }
   initPrinter();
+  connect(ui->devBtn, &QPushButton::clicked, this, [this]() {
+    this->centralWidget()->setStyleSheet("");
+    QMessageBox::about(
+        this, "Heydar&Ashkan application",
+        "This application is demo and is not safe to use in environments!\n"
+        "Contact us:\n"
+        "- Heydar.Mahmoodi75@gmail.com\n"
+        "- Ashkan.younesi216@gmail.com\n");
+  });
 }
 
 BHMI::~BHMI() { delete ui; }
