@@ -1,5 +1,7 @@
 #include "SerialHandler.h"
 
+#include <tmpLambda.h>
+
 #include <QDebug>
 #include <QIntValidator>
 #include <QLineEdit>
@@ -44,10 +46,7 @@ SerialHandler::SerialHandler(QWidget *parent)
 
 SerialHandler::~SerialHandler() { delete ui; }
 
-void SerialHandler::openSerialPort(
-
-    std::function<void(QByteArray const &ba)> const &onReadCB) {
-    auto static & readCB = onReadCB;
+void SerialHandler::openSerialPort(std::shared_ptr<Holder> holder) {
   closeSerialPort();
   updateSettings();
   const SerialHandler::Settings p = settings();
@@ -71,10 +70,10 @@ void SerialHandler::openSerialPort(
                          .arg(p.stringStopBits)
                          .arg(p.stringFlowControl);
     qDebug() << status;
-    connect(_serialPort.get(), &QSerialPort::readyRead, this,
-            [&]() {auto reading = _serialPort->readAll();
-        qDebug()<<reading;
-        readCB(reading);
+    connect(_serialPort.get(), &QSerialPort::readyRead, this, [&, holder]() {
+      auto reading = _serialPort->readAll();
+      qDebug() << reading;
+      holder->doThat(reading);
     });
   } else {
     QMessageBox::critical(this, tr("Error"), _serialPort->errorString());

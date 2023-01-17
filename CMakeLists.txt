@@ -29,6 +29,7 @@ add_executable(BHMI
   CameraDriver.h CameraDriver.cpp
   PrintFirst.h PrintFirst.cpp
   ${RES_FOR_EXE}
+  tmpLambda.h
 )
 
 target_link_libraries(BHMI PRIVATE

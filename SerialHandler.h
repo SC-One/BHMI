@@ -6,7 +6,9 @@
 #include <QSerialPort>
 #include <QWidget>
 #include <functional>
+#include <memory>
 
+class Holder;
 class QIntValidator;
 class QSerialPort;
 namespace Ui {
@@ -21,8 +23,7 @@ class SerialHandler : public QWidget {
   ~SerialHandler();
 
  public:
-  void openSerialPort(
-      std::function<void(QByteArray const &ba)> const &onReadCB);
+  void openSerialPort(std::shared_ptr<Holder> holder);
 
   void closeSerialPort();
 

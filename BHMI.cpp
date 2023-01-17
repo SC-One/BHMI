@@ -6,6 +6,7 @@
 #include <NewBucket.h>
 #include <PrintFirst.h>
 #include <SerialHandler.h>
+#include <tmpLambda.h>
 
 #include <QCameraViewfinder>
 #include <QComboBox>
@@ -248,24 +249,11 @@ void BHMI::initSettings() {
     }
     tempSettings->exec();
   });
+  if (nullptr == _holder.get()) _holder.reset(new Holder(this));
   connect(_sensorSH.data(), &SerialHandler::startPortClicked, this, [this]() {
     _sensorSH->close();
-    auto static lambda = [this](QByteArray const &ba) {
-            qDebug()<<ba;
-            if(ba.size()<4)return;
-          QDataStream streammer(ba);
-          Structures::DataOverSerial data;
-          float newBucketTemp;
-          float cameraOnTemp;
-
-          streammer >> data.s1 >> data.s2 >> data.rawPump >> newBucketTemp >>
-              cameraOnTemp;
-          data.newBucket = newBucketTemp;
-          data.cameraOn = cameraOnTemp;
-          setLastData(data);
-          qDebug() << ba;
-        };
-    _sensorSH->openSerialPort(lambda);});
+    _sensorSH->openSerialPort(_holder);
+  });
 }
 
 void BHMI::initLoadManagement() {

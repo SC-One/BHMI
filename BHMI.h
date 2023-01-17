@@ -8,12 +8,13 @@
 #include <QMainWindow>
 #include <QPointer>
 #include <QTimer>
+#include <memory>
 
 class BucketsModel;
 class SerialHandler;
 class DriverSettings;
 class PrintFirst;
-
+class Holder;
 QT_BEGIN_NAMESPACE
 class QTableView;
 class QCameraViewfinder;
@@ -80,5 +81,7 @@ class BHMI : public QMainWindow {
   QDateTime _dateTimeShow;
   QScopedPointer<DriverSettings> _driverDialog;
   QScopedPointer<PrintFirst> _printer;
+
+  std::shared_ptr<Holder> _holder;
 };
 #endif  // BHMI_H
