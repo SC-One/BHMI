@@ -45,8 +45,11 @@ SerialHandler::SerialHandler(QWidget *parent)
 SerialHandler::~SerialHandler() { delete ui; }
 
 void SerialHandler::openSerialPort(
+
     std::function<void(QByteArray const &ba)> const &onReadCB) {
+    auto static & readCB = onReadCB;
   closeSerialPort();
+  updateSettings();
   const SerialHandler::Settings p = settings();
   _serialPort->setPortName(p.name);
   _serialPort->setBaudRate(p.baudRate);
@@ -69,7 +72,10 @@ void SerialHandler::openSerialPort(
                          .arg(p.stringFlowControl);
     qDebug() << status;
     connect(_serialPort.get(), &QSerialPort::readyRead, this,
-            [&]() { onReadCB(_serialPort->readAll()); });
+            [&]() {auto reading = _serialPort->readAll();
+        qDebug()<<reading;
+        readCB(reading);
+    });
   } else {
     QMessageBox::critical(this, tr("Error"), _serialPort->errorString());
     qDebug() << "Open error! " << _serialPort->errorString();
@@ -194,7 +200,6 @@ void SerialHandler::fillPortsInfo() {
 }
 
 void SerialHandler::updateSettings() {
-  qDebug() << "Update settings";
   m_currentSettings.name = ui->serialPortInfoListBox->currentText();
 
   if (ui->baudRateBox->currentIndex() == 4) {
