@@ -21,6 +21,7 @@
 #include <QListView>
 #include <QMessageBox>
 #include <QScopedPointer>
+#include <QString>
 #include <QStringListModel>
 #include <QTabWidget>
 #include <QTableView>
@@ -31,6 +32,12 @@
 #include "./ui_BHMI.h"
 
 static constexpr auto TIMER_UPDATE_SEC = 1;
+
+static QString toWriteOnSerial(QString const &rawData) {
+  static QString const ba = "p(%1,%2)";
+  return ba.arg(rawData.size()).arg(rawData);
+}
+
 BHMI::BHMI(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::BHMI),
@@ -51,10 +58,10 @@ BHMI::BHMI(QWidget *parent)
   {
     Structures::DataOverSerial data;
     data.cameraOn = 0;
-    data.newBucket = 1;
-    data.rawPump = 80;
-    data.s2 = 70;
-    data.s1 = 90;
+    data.newBucket = 0;
+    data.rawPump = 0;
+    data.s2 = 0;
+    data.s1 = 0;
     setLastData(data);
   }
   initPrinter();
@@ -69,6 +76,19 @@ BHMI::BHMI(QWidget *parent)
   });
   connect(ui->Weighbridge, &QPushButton::clicked, this,
           [this]() { setCamera(false); });
+
+  connect(ui->realPrintBuckets, &QPushButton::clicked, this, [this]() {
+    QString str;
+    auto stringList = _mainListModel->stringList();
+    for (auto const &item : stringList) {
+      str.append(item).append("\n");
+    }
+    static QString const TOTALITY = "Bucket counts: %1 \nTotal Weights: %2\n";
+    str.append("--------------------------\n")
+        .append(TOTALITY.arg(ui->totalBucketsCount->text())
+                    .arg(ui->sumBucketsWeight->text()));
+    qDebug() << "write Byte size:" << _sensorSH->write(toWriteOnSerial(str));
+  });
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -219,7 +239,7 @@ void BHMI::updateDataOverSerial(Structures::DataOverSerial const &data) {
   ui->sensor2->setValue(25 * (data.s2 - 4));
   setCamera(data.cameraOn);
   {
-    if (data.newBucket /*&& ui->addBtn->isChecked()*/) {
+    if (data.newBucket && ui->addBtn->isChecked()) {
       NewBucket bucketAdder;
       bucketAdder.setBucket(calculateBucket(data.s1, data.s2));
       //    auto res = bucketAdder.exec();

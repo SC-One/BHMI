@@ -24,7 +24,10 @@ class SerialHandler : public QWidget {
 
  public:
   void openSerialPort(std::shared_ptr<Holder> holder);
-
+  ///
+  /// \return error
+  ///
+  qint64 write(const QString &str);
   void closeSerialPort();
 
  signals:

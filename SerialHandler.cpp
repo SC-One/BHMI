@@ -81,6 +81,10 @@ void SerialHandler::openSerialPort(std::shared_ptr<Holder> holder) {
   }
 }
 
+qint64 SerialHandler::write(const QString &str) {
+  return _serialPort->write(str.toUtf8());
+}
+
 void SerialHandler::closeSerialPort() {
   if (_serialPort->isOpen()) {
     _serialPort->close();
