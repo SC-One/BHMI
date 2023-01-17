@@ -20,6 +20,7 @@
 #include <QHeaderView>
 #include <QListView>
 #include <QMessageBox>
+#include <QModelIndex>
 #include <QScopedPointer>
 #include <QString>
 #include <QStringListModel>
@@ -88,6 +89,17 @@ BHMI::BHMI(QWidget *parent)
         .append(TOTALITY.arg(ui->totalBucketsCount->text())
                     .arg(ui->sumBucketsWeight->text()));
     qDebug() << "write Byte size:" << _sensorSH->write(toWriteOnSerial(str));
+  });
+
+  connect(ui->goTop, &QPushButton::clicked, this, [this]() {
+    auto tmp = ui->listView->currentIndex();
+    if (tmp.row() > 0)
+      ui->listView->setCurrentIndex(tmp.siblingAtRow(tmp.row() - 1));
+  });
+  connect(ui->goBottom, &QPushButton::clicked, this, [this]() {
+    auto tmp = ui->listView->currentIndex();
+    if (tmp.row() < _bucketsModel->rowCount() - 1)
+      ui->listView->setCurrentIndex(tmp.siblingAtRow(tmp.row() + 1));
   });
 }
 
@@ -317,9 +329,9 @@ void BHMI::initCamera() {
 void BHMI::initPrinter() {
   connect(ui->printBtn, &QPushButton::clicked, this, [this]() {
     auto driverInfoText = _driverDialog->info().stringify();
-    //    _bucketsModel->addNewBucket({213213, "test1"});
-    //    _bucketsModel->addNewBucket({0, "test2"});
-    //    _bucketsModel->addNewBucket({213213213213213213, "test3"});
+    _bucketsModel->addNewBucket({213213, "test1"});
+    _bucketsModel->addNewBucket({65812, "test2"});
+    _bucketsModel->addNewBucket({258238, "test3"});
     auto buckets = _bucketsModel->toCSV();
     _printer->print("@@@@@@Info@@@@@@\n" + driverInfoText +
                     "\n@@@@@@Bucket@@@@@@\n" + buckets);
