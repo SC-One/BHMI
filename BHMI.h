@@ -17,8 +17,11 @@ class PrintFirst;
 class Holder;
 QT_BEGIN_NAMESPACE
 class QTableView;
+class QListView;
 class QCameraViewfinder;
 class QDateTimeEdit;
+class QStringListModel;
+class QPushButton;
 namespace Ui {
 class BHMI;
 }
@@ -67,9 +70,11 @@ class BHMI : public QMainWindow {
   Ui::BHMI *ui;
   QTimer _timeUpdater;
 
-  QPointer<QTableView> _bucketsView;
+  QPointer<QListView> _bucketsView;
   QScopedPointer<BucketsModel> _bucketsModel;
+  QScopedPointer<QStringListModel> _mainListModel;
 
+  QPushButton *_lastSelected = nullptr;
   bool _cameraMode;
 
   QScopedPointer<SerialHandler> _sensorSH;  // sensor serial handler

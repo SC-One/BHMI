@@ -7,6 +7,10 @@
 #include <QDebug>
 #include <QStringList>
 
+static inline int mapToICValue(int raw) {
+  return (raw / 4096.0f) * (20 - 4 + 1) + 4;
+}
+
 struct Holder {
   QByteArray wholeData;
 
@@ -24,8 +28,8 @@ struct Holder {
           listInt.last().remove(x, 1);
         }
 
-        data.s1 = listInt[0].toInt();
-        data.s2 = listInt[1].toInt();
+        data.s1 = mapToICValue(listInt[0].toInt());
+        data.s2 = mapToICValue(listInt[1].toInt());
         data.rawPump = listInt[2].toInt();
         data.newBucket = listInt[3].toInt();
         data.cameraOn = listInt[4].toInt();

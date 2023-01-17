@@ -18,8 +18,10 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QHeaderView>
+#include <QListView>
 #include <QMessageBox>
 #include <QScopedPointer>
+#include <QStringListModel>
 #include <QTabWidget>
 #include <QTableView>
 #include <QVBoxLayout>
@@ -32,11 +34,13 @@ static constexpr auto TIMER_UPDATE_SEC = 1;
 BHMI::BHMI(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::BHMI),
+      _mainListModel(new QStringListModel),
       _sensorSH(new SerialHandler),
       _cameraView(new QCameraViewfinder),
       _driverDialog(new DriverSettings),
       _printer(new PrintFirst) {
   ui->setupUi(this);
+  _lastSelected = ui->Weighbridge;
 
   _dateTimeShow = QDateTime::currentDateTime();
   initTimer();
@@ -47,15 +51,15 @@ BHMI::BHMI(QWidget *parent)
   {
     Structures::DataOverSerial data;
     data.cameraOn = 0;
-    data.newBucket = 0;
-    data.rawPump = 0;
-    data.s2 = 0;
-    data.s1 = 0;
+    data.newBucket = 1;
+    data.rawPump = 80;
+    data.s2 = 70;
+    data.s1 = 90;
     setLastData(data);
   }
   initPrinter();
-  connect(ui->devBtn, &QPushButton::clicked, this, [this]() {
-    this->centralWidget()->setStyleSheet("");
+  connect(ui->test_lic, &QPushButton::clicked, this, [this]() {
+    //    this->centralWidget()->setStyleSheet("");
     QMessageBox::about(
         this, "Heydar&Ashkan application",
         "This application is demo and is not safe to use in environments!\n"
@@ -63,6 +67,8 @@ BHMI::BHMI(QWidget *parent)
         "- Heydar.Mahmoodi75@gmail.com\n"
         "- Ashkan.younesi216@gmail.com\n");
   });
+  connect(ui->Weighbridge, &QPushButton::clicked, this,
+          [this]() { setCamera(false); });
 }
 
 BHMI::~BHMI() { delete ui; }
@@ -82,8 +88,9 @@ void BHMI::onAddBUcket() {
   if (lastData.newBucket) {
     NewBucket bucketAdder;
     bucketAdder.setBucket(calculateBucket(lastData.s1, lastData.s2));
-    auto res = bucketAdder.exec();
-    if (res) {
+    //    auto res = bucketAdder.exec();
+    //    if (res)
+    if (ui->addBtn->isChecked()) {
       _bucketsModel->addNewBucket(bucketAdder.bucket());
     }
   }
@@ -127,28 +134,29 @@ void BHMI::onRemoveBucket() {
 }
 
 void BHMI::initBucketView() {
-  _bucketsView = new QTableView(this);
+  _bucketsView = ui->listView;
   _bucketsModel.reset(new BucketsModel);
   {
-    _bucketsView->setModel(_bucketsModel.get());
-    ui->bucketParentLayout->insertWidget(1, _bucketsView.data(), 10);
-    _bucketsView->horizontalHeader()->setSectionResizeMode(
-        QHeaderView::Stretch);
-    //  _bucketsView->horizontalHeader()->setSectionResizeMode(
-    //      1, QHeaderView::ResizeMode::ResizeToContents);
-    //    _bucketsView->horizontalHeader()->setStretchLastSection(true);
-    //    _bucketsView->resizeColumnsToContents();
-    _bucketsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    connect(_bucketsModel.get(), &BucketsModel::dataUpdated, this, [this]() {
+      auto totalBuckets = _bucketsModel->buckets();
+      QStringList result;
+      for (int i = 0; i < totalBuckets.size(); ++i) {
+        auto const &bucket = totalBuckets[i];
+        auto weight = bucket.convert(Structures::WeightUnit::KiloGram);
+        static QString const CURRENT_BUCKET_PF = "Bucket %1: \t %2 \tKiloGram ";
+        result.append(CURRENT_BUCKET_PF.arg(i).arg(weight));
+      }
 
-    //    connect(_bucketsView.data(), &QTableView::doubleClicked, this,
-    //            [this](QModelIndex const &index) {
-    //              _bucketsModel->removeBucket(index.row());
-    //            });
-    _bucketsView->horizontalHeader()->setStyleSheet(
-        "background-color: rgb(196, 160, 0);");
+      _mainListModel->setStringList(result);
+    });
   }
   {
-    connect(ui->addBtn, &QPushButton::clicked, this, &BHMI::onAddBUcket);
+    ui->listView->setModel(_mainListModel.get());
+    _bucketsView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  }
+  {
+    //    connect(ui->addBtn, &QPushButton::clicked, this,
+    //    &BHMI::onAddBUcket);
     connect(ui->saveBtn, &QPushButton::clicked, this, &BHMI::onSaveBuckets);
     connect(ui->rmvBtn, &QPushButton::clicked, this, &BHMI::onRemoveBucket);
     connect(_bucketsModel.get(), &BucketsModel::dataUpdated, this, [this]() {
@@ -165,29 +173,30 @@ void BHMI::initBucketView() {
           " " + Structures::wUnittoString(_bucketsModel->currentUnit()));
       ui->totalBucketsCount->setText(QString::number(totalBuckets.size()));
     });
-    connect(ui->weightUnitCmb,
-            QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-            [this](int index) {
-              switch (index) {
-                case 0:
-                  _bucketsModel->setCurrentUnit(Structures::Gram);
-                  break;
-                case 1:
-                  _bucketsModel->setCurrentUnit(Structures::KiloGram);
-                  break;
-                case 2:
-                  _bucketsModel->setCurrentUnit(Structures::Tonne);
-                  break;
-                default:
-                  break;
-              }
-            });
+    _bucketsModel->setCurrentUnit(Structures::KiloGram);
+    //    connect(ui->weightUnitCmb,
+    //            QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+    //            [this](int index) {
+    //              switch (index) {
+    //                case 0:
+    //                  _bucketsModel->setCurrentUnit(Structures::Gram);
+    //                  break;
+    //                case 1:
+    //                  _bucketsModel->setCurrentUnit(Structures::KiloGram);
+    //                  break;
+    //                case 2:
+    //                  _bucketsModel->setCurrentUnit(Structures::Tonne);
+    //                  break;
+    //                default:
+    //                  break;
+    //              }
+    //            });
   }
   {
     ui->cameraTurner->setVisible(true);
     connect(ui->cameraTurner, &QPushButton::clicked, this, [this]() {
       Structures::DataOverSerial data;
-      data.cameraOn = !getLastData().cameraOn;
+      data.cameraOn = 1;
       data.newBucket = 0;
       data.rawPump = 0;
       data.s2 = 0;
@@ -209,7 +218,15 @@ void BHMI::updateDataOverSerial(Structures::DataOverSerial const &data) {
   ui->sensor1->setValue(25 * (data.s1 - 4));
   ui->sensor2->setValue(25 * (data.s2 - 4));
   setCamera(data.cameraOn);
-  ui->addBtn->setEnabled(data.newBucket);
+  {
+    if (data.newBucket /*&& ui->addBtn->isChecked()*/) {
+      NewBucket bucketAdder;
+      bucketAdder.setBucket(calculateBucket(data.s1, data.s2));
+      //    auto res = bucketAdder.exec();
+      //    if (res)
+      { _bucketsModel->addNewBucket(bucketAdder.bucket()); }
+    }
+  }
 }
 
 void BHMI::initSettings() {
@@ -274,7 +291,7 @@ void BHMI::turnCameraOff() { _cameraDriver.stop(); }
 void BHMI::initCamera() {
   _cameraView.reset(new QCameraViewfinder());
   _cameraDriver.setCameraRenderer(_cameraView.get());
-  ui->bucketParentLayout->insertWidget(1, _cameraView.data());
+  ui->bucketsItemsGroup->addWidget(_cameraView.data());
 }
 
 void BHMI::initPrinter() {
@@ -303,17 +320,57 @@ void BHMI::setCamera(bool value) {
   emit cameraModeChanged(value);
 }
 
+static void hideChildren(QLayout *lay) {
+  auto const count = lay->count();
+  for (int i = 0; i < count; ++i) {
+    auto l = lay->itemAt(i)->layout();
+    auto w = lay->itemAt(i)->widget();
+    if (nullptr != w) {
+      w->hide();
+    } else if (nullptr != l)
+      hideChildren(l);
+  }
+}
+
+static void showChildren(QLayout *lay) {
+  auto const count = lay->count();
+  for (int i = 0; i < count; ++i) {
+    auto l = lay->itemAt(i)->layout();
+    auto w = lay->itemAt(i)->widget();
+    if (nullptr != w) {
+      w->show();
+    } else if (nullptr != l)
+      showChildren(l);
+  }
+}
+
 void BHMI::onCameraModeChanged(bool turnOn) {
+  static QString const mastmaliWithBorder =
+      "QPushButton{ "
+      "border:5px solid #ff0000;"
+      "border-color: rgb(0, 0, 0);"
+      "%1"
+      "}";
+  auto const static normal =
+      mastmaliWithBorder.arg("background-color: rgb(238, 238, 236);");
+  auto const static selected =
+      mastmaliWithBorder.arg("background-color:rgb(78, 154, 6);");
+
   if (turnOn) {
-    turnCameraOn();  // TODO: you should take data from serial camera and
-                     // show it
-    ui->totalSumFrame->hide();
-    _bucketsView->hide();
+    _lastSelected->setStyleSheet(normal);
+    _lastSelected = ui->cameraTurner;
+    _lastSelected->setStyleSheet(selected);
+
+    turnCameraOn();
+    hideChildren(ui->bucketsItemsGroup);
     _cameraView->show();
   } else {
+    _lastSelected->setStyleSheet(normal);
+    _lastSelected = ui->Weighbridge;
+    _lastSelected->setStyleSheet(selected);
+
     turnCameraOff();
-    ui->totalSumFrame->show();
-    _bucketsView->show();
+    showChildren(ui->bucketsItemsGroup);
     _cameraView->hide();
   }
 }
